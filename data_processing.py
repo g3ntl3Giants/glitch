@@ -1,5 +1,7 @@
 # data_processing.py
 
+from pydub.silence import split_on_silence
+from pydub import AudioSegment
 import os
 import logging
 import tiktoken
@@ -12,8 +14,6 @@ import moviepy.editor as mp
 from openai import OpenAI
 
 client = OpenAI()
-from pydub import AudioSegment
-from pydub.silence import split_on_silence
 
 # Setup logging
 logging.basicConfig(filename='data_processing.log', level=logging.INFO)
@@ -28,6 +28,7 @@ SUPPORTED_EXTENSIONS = [
     '.py', '.go', '.rs', '.rb', '.sh', '.html', '.pdf', '.avi', '.wmv'
     # Add other supported file extensions here
 ]
+
 
 def extract_text_from_pdf(pdf_path: str) -> str:
     """Extract text from a given PDF file."""
@@ -87,7 +88,8 @@ def process_files(directory: str) -> pd.DataFrame:
 
         for file_path in traverse_directory(directory):
             # Asynchronously extract text from files
-            futures.append(executor.submit(_extract_text, os.path.basename(file_path), file_path))
+            futures.append(executor.submit(
+                _extract_text, os.path.basename(file_path), file_path))
 
         # Append results of the futures to texts
         for future in futures:
@@ -143,7 +145,7 @@ def transcribe_audio(audio_path: str) -> str:
 def transcribe_large_audio(audio_path: str, chunk_length: int = 10000) -> str:
     """
     Transcribe audio that might be larger than the API's maximum limit.
-    
+
     :param audio_path: Path to the audio file.
     :param chunk_length: Length of chunks to split the audio (in ms). Default is 10000ms (10s).
     :return: Transcribed text.
@@ -156,17 +158,18 @@ def transcribe_large_audio(audio_path: str, chunk_length: int = 10000) -> str:
             silence_thresh=-40,    # consider it silent if quieter than -40 dBFS
             keep_silence=500,      # keep 500ms of leading/trailing silence
         )
-        
+
         # Fallback: If silence splitting creates too large chunks, split audio into fixed-size chunks
         if any(len(chunk) > chunk_length for chunk in chunks):
-            chunks = [audio[i:i+chunk_length] for i in range(0, len(audio), chunk_length)]
-        
+            chunks = [audio[i:i+chunk_length]
+                      for i in range(0, len(audio), chunk_length)]
+
         transcriptions = []
         for i, chunk in enumerate(chunks):
             chunk_path = f"chunk_{i}.mp3"
             chunk.export(chunk_path, format="mp3")
             transcriptions.append(transcribe_audio(chunk_path))
-        
+
         return " ".join(transcriptions)
     except Exception as e:
         logger.error(f"Error transcribing {audio_path}: {e}")
@@ -185,7 +188,7 @@ def extract_text_from_video(video_path: str) -> str:
 
     # Transcribe Audio
     transcript_text = transcribe_large_audio(audio_path)
-    
+
     # print(f'Transcribe Audio from {transcript_text}')
     return transcript_text
 
@@ -204,7 +207,8 @@ def _extract_text(file, file_path):
         elif extension in ['.mov', '.mp4', '.avi', '.wmv']:
             text = extract_text_from_video(file_path)
         else:
-            logger.info(f"Unsupported file extension {extension} for file {file}")
+            logger.info(f"Unsupported file extension {
+                        extension} for file {file}")
             text = ""
         return (file, text)
     except Exception as e:
@@ -215,14 +219,16 @@ def _extract_text(file, file_path):
 def tokenize_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     """Tokenize the dataframe using OpenAI's tiktoken."""
     tokenizer = tiktoken.get_encoding("cl100k_base")
-    df['n_tokens'] = df.text.apply(lambda x: len(tokenizer.encode(x, allowed_special="all")) if x.strip() != "" else 0)
+    df['n_tokens'] = df.text.apply(lambda x: len(tokenizer.encode(
+        x, allowed_special="all")) if x.strip() != "" else 0)
 
     max_tokens = 500
 
     def split_into_many(text: str, max_tokens: int = max_tokens) -> List[str]:
         """Split the text into many based on the given max tokens."""
         sentences = text.split('. ')
-        n_tokens = [len(tokenizer.encode(" " + sentence, allowed_special="all")) for sentence in sentences]
+        n_tokens = [len(tokenizer.encode(" " + sentence, allowed_special="all"))
+                    for sentence in sentences]
         chunks = []
         tokens_so_far = 0
         chunk = []
@@ -250,7 +256,7 @@ def tokenize_dataframe(df: pd.DataFrame) -> pd.DataFrame:
             shortened.append(row[1]['text'])
 
     df = pd.DataFrame(shortened, columns=['text'])
-    df['n_tokens'] = df.text.apply(lambda x: len(tokenizer.encode(x, allowed_special="all")))
+    df['n_tokens'] = df.text.apply(lambda x: len(
+        tokenizer.encode(x, allowed_special="all")))
 
     return df
-
