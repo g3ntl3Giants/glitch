@@ -5,6 +5,7 @@ import json
 import logging
 import time
 import threading
+from openai import OpenAI
 from pathlib import Path
 from chatgpt import ChatGPT
 from cli_animations import loading_animation
@@ -110,17 +111,21 @@ def chat_with_user():
                         continue
 
                 if combined_file_contents:
-                    response = chatbot_instance.chat(combined_file_contents, LOG_FILE, BOT_NAME)
+                    response = chatbot_instance.chat(
+                        combined_file_contents, LOG_FILE, BOT_NAME)
                     print(f"{BOT_NAME}: {response}")
                 else:
-                    print(f"{BOT_NAME}: No valid files or directories were provided.")
+                    print(
+                        f"{BOT_NAME}: No valid files or directories were provided.")
             else:
-                response = chatbot_instance.chat(user_input, LOG_FILE, BOT_NAME)
+                response = chatbot_instance.chat(
+                    user_input, LOG_FILE, BOT_NAME)
                 print(f"{BOT_NAME}: {response}")
 
     except Exception as e:
         logging.error(f"Error in chat_with_user: {e}")
         print(f"Error: {e}")
+
 
 if __name__ == "__main__":
     try:

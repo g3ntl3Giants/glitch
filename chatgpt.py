@@ -1,7 +1,8 @@
 import openai
+from openai import OpenAI
 import time
 import logging
-from typing import List, Dict, Any
+from typing import List, Dict, Optional, Any
 
 
 class ChatGPTError(Exception):
@@ -19,7 +20,7 @@ class ChatGPT:
         self.api_key = api_key
         self.chatbot = chatbot
         self.retries = retries
-        self.client = openai.OpenAI(api_key=self.api_key)
+        self.client = OpenAI(api_key=self.api_key)
         # Initialize conversation with the system prompt
         self.conversation: List[Dict[str, str]] = [
             {"role": "system", "content": chatbot}]
@@ -28,7 +29,7 @@ class ChatGPT:
         self.conversation.append({"role": "user", "content": user_input})
 
         response = self.chatgpt_with_retry(
-            self.conversation, user_input)
+            self.conversation)
 
         self.conversation.append({"role": "assistant", "content": response})
         # Save to log file
@@ -56,25 +57,25 @@ class ChatGPT:
         chat_response = completion.choices[0].message.content
         return chat_response
 
-    def chatgpt_with_retry(self, conversation: List[Dict[str, str]], user_input: str, **kwargs) -> Optional[str]:
+    def chatgpt_with_retry(self, conversation: List[Dict[str, str]], **kwargs) -> Optional[str]:
         response = None
         backoff_factor = 1.5
         wait_time = 0.1
 
         for i in range(self.retries):
             try:
-                response = self.chatgpt(conversation, user_input, **kwargs)
+                response = self.chatgpt(conversation, **kwargs)
                 return response
             except openai.RateLimitError as e:
-                logging.warning(f"Rate limit reached, waiting {
-                                wait_time} seconds before retrying...")
+                logging.warning(f"""Rate limit reached, waiting {
+                                wait_time} seconds before retrying...""")
                 time.sleep(wait_time)
                 wait_time *= backoff_factor
             except openai.APIStatusError as e:
-                logging.warning(f"Error in chatgpt attempt {
-                                i + 1}: {e}. Retrying...")
+                logging.warning(f"""Error in chatgpt attempt {
+                                i + 1}: {e}. Retrying...""")
             except Exception as e:
-                logging.error(f"Unexpected error in chatgpt attempt {
-                              i + 1}: {e}. No more retries.")
+                logging.error(f"""Unexpected error in chatgpt attempt {
+                              i + 1}: {e}. No more retries.""")
                 raise ChatGPTError from e
         return None

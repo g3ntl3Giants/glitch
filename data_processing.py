@@ -12,6 +12,13 @@ from typing import List
 from concurrent.futures import ThreadPoolExecutor
 import moviepy.editor as mp
 from openai import OpenAI
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OpenAI(api_key=OPENAI_API_KEY)
 
 client = OpenAI()
 
@@ -207,8 +214,8 @@ def _extract_text(file, file_path):
         elif extension in ['.mov', '.mp4', '.avi', '.wmv']:
             text = extract_text_from_video(file_path)
         else:
-            logger.info(f"Unsupported file extension {
-                        extension} for file {file}")
+            logger.info(f"""Unsupported file extension {
+                        extension} for file {file}""")
             text = ""
         return (file, text)
     except Exception as e:
