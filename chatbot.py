@@ -22,7 +22,6 @@ logging.basicConfig(filename="chatbot.log", level=logging.INFO)
 BOT_NAME = "Glitch"
 LOG_FILE = "chat_log.txt"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-# CHATBOT_SYSTEM_MESSAGE = "This is a chatbot that uses integrated GPT-4 and Chroma embeddings."
 CHATBOT_SYSTEM_MESSAGE = extract_text_from_txt('./sys_prompt.md')
 
 
