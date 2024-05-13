@@ -102,7 +102,7 @@ class ChatGPT:
         params = {**self.DEFAULT_PARAMS, **kwargs}
         messages_input = conversation.copy()
         completion = self.client.chat.completions.create(
-            model="gpt-4-0125-preview",
+            model="gpt-4o",
             temperature=params["temperature"],
             frequency_penalty=params["frequency_penalty"],
             presence_penalty=params["presence_penalty"],
