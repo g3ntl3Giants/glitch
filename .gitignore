@@ -28,4 +28,5 @@
 /metamate
 /env
 /first
-user_prompt_*.txt
+/user_input
+/video_capture*
