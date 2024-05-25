@@ -16,7 +16,7 @@ class ChatGPT:
         "frequency_penalty": 0.2,
         "presence_penalty": 0
     }
-    MAX_TOKENS: int = 64000*2
+    MAX_TOKENS: int = 64000
 
     def __init__(self, api_key: str, chatbot: str, retries: int = 3):
         self.api_key = api_key
