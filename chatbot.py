@@ -31,7 +31,6 @@ def process_file(file_path):
     return "\n" + file_contents[1] if file_contents[1] else ""
 
 
-
 def setup_chatbot():
     try:
         # Start the loading animation in a separate thread
