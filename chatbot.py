@@ -9,7 +9,7 @@ from openai import OpenAI
 from pathlib import Path
 from chatgpt import ChatGPT
 from cli_animations import loading_animation
-from data_processing import extract_text_from_html, extract_text_from_pdf, extract_text_from_txt
+from data_processing import extract_text_from_html, extract_text_from_pdf, extract_text_from_txt, _extract_text
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -26,26 +26,10 @@ CHATBOT_SYSTEM_MESSAGE = extract_text_from_txt('./sys_prompt.md')
 
 
 def process_file(file_path):
-    _, file_extension = os.path.splitext(file_path)
-    file_extension = file_extension.lower()
-    file_contents = ""
-    # Process known file types
-    if file_extension in ['.pdf', '.txt', '.html']:
-        if file_extension == '.pdf':
-            file_contents = extract_text_from_pdf(file_path)
-        elif file_extension == '.txt':
-            file_contents = extract_text_from_txt(file_path)
-        elif file_extension == '.html':
-            file_contents = extract_text_from_html(file_path)
-    elif file_extension in ['.py', '.tsx', '.jsx', '.js', '.ts']:
-        file_contents = extract_text_from_txt(file_path)
-    elif file_extension == '.json':
-        with open(file_path, 'r', encoding='utf-8') as file:
-            file_contents = json.dumps(json.load(file), indent=2)
-    else:
-        print(f"{BOT_NAME}: I'm sorry, I can't process the file: {file_path}")
-        return ""
-    return "\n" + file_contents
+    file_name = os.path.basename(file_path)
+    file_contents = _extract_text(file_name, file_path)
+    return "\n" + file_contents[1] if file_contents[1] else ""
+
 
 
 def setup_chatbot():

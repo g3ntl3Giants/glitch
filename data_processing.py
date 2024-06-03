@@ -32,7 +32,8 @@ MAX_THREADS = 15  # Limit the number of threads to prevent overloading
 SUPPORTED_EXTENSIONS = [
     '.ts', '.tsx', '.js', '.jsx', '.cpp', '.css', '.json',
     '.kt', '.swift', '.md', '.java', '.php', '.txt', '.mov', '.mp4',
-    '.py', '.go', '.rs', '.rb', '.sh', '.html', '.pdf', '.avi', '.wmv'
+    '.py', '.go', '.rs', '.rb', '.sh', '.html', '.pdf', '.avi', '.wmv', 
+    '.md', '.yml', '.cs', '.hh', '.h'
     # Add other supported file extensions here
 ]
 
@@ -209,13 +210,12 @@ def _extract_text(file, file_path):
             text = extract_text_from_pdf(file_path)
         elif extension == '.html':
             text = extract_text_from_html(file_path)
-        elif extension in ['.txt', '.md', '.css', '.js', '.jsx', '.ts', '.tsx', '.cpp', '.json', '.kt', '.swift', '.java', '.php', '.py', '.go', '.rs', '.rb', '.sh']:
+        elif extension in ['.txt', '.md', '.cs', '.css', '.cpp', '.js', '.jsx', '.ts', '.tsx', '.json', '.kt', '.swift', '.java', '.php', '.py', '.go', '.rs', '.rb', '.sh', '.yml', '.proto', '.hh', '.h']:
             text = extract_text_from_txt(file_path)
         elif extension in ['.mov', '.mp4', '.avi', '.wmv']:
             text = extract_text_from_video(file_path)
         else:
-            logger.info(f"""Unsupported file extension {
-                        extension} for file {file}""")
+            logger.info(f"Unsupported file extension {extension} for file {file}")
             text = ""
         return (file, text)
     except Exception as e:

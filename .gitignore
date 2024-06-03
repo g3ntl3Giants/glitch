@@ -2,7 +2,7 @@
 /archive
 /chat_log.txt
 /d2bapp
-/data
+/data*
 /__pycache__
 /processed
 /*.log
