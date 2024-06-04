@@ -113,7 +113,7 @@ def process_files(directory: str) -> pd.DataFrame:
     if not os.path.exists('processed'):
         os.makedirs('processed')
 
-    df.to_csv('processed/scraped.csv')
+    df.to_csv('processed/scraped.csv', escapechar='\\')
     logger.info("Files processed and saved to 'processed/scraped.csv'.")
     return df
 
