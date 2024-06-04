@@ -124,7 +124,7 @@ class ChatGPT:
                 messages=messages_input
             )
 
-        chat_response = completion.choices[0].message
+        chat_response = completion.choices[0].message.content
         return chat_response
 
     @retry(wait=wait_random_exponential(multiplier=1, max=120), stop=stop_after_attempt(10), reraise=True)
