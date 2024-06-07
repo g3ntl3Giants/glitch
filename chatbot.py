@@ -70,11 +70,19 @@ def chat_with_user(user_input):
 
             if combined_file_contents:
                 response = chatbot_instance.chat(combined_file_contents, LOG_FILE, BOT_NAME)
+
+                (f'ping...response...{response}')
+                print(f'ping...response...{response}')
                 return {"response": response}
             else:
                 return {"error": "No valid files or directories were provided."}
         else:
             response = chatbot_instance.chat(user_input, LOG_FILE, BOT_NAME)
+
+
+
+            (f'ping...response...{response}')
+            print(f'ping...response...{response}')
             return {"response": response}
     except Exception as e:
         logging.error(f"Error in chat_with_user: {e}")
